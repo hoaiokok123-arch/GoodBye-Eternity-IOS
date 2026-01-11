@@ -1,26 +1,43 @@
-name: Build ESP (.tipa)
 
-on:
-  workflow_dispatch:
+name: "Build iOS app"
+
+# on: [push]
+on: [workflow_dispatch]
 
 jobs:
-  build:
+  build_ios:
     runs-on: macos-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout repository
+        uses: actions/checkout@v4
 
-      - name: Install Theos
+      - name: build archive and ipaify
         run: |
-          git clone --recursive https://github.com/theos/theos.git $HOME/theos
-          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          set -xe
 
-      - name: Build
-        run: |
-          make package
+          wget -O archive.zip "https://www.dropbox.com/scl/fi/88b0su9t4gqc3wja626as/hoai1.zip?rlkey=r6lyroeu5ht7d5jnmqaj3nhd6&st=tyd9k7s3&dl=1"
+          unzip -o archive.zip -d .
 
-      - name: Upload .tipa
+          xcodebuild -list -project "Goodbye Eternity.xcodeproj"
+
+          xcodebuild archive \
+            -project "Goodbye Eternity.xcodeproj" \
+            -scheme "Goodbye Eternity" \
+            -archivePath "Goodbye Eternity.xcarchive" \
+            -configuration Release \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+          mkdir Payload
+          mv Goodbye\ Eternity.xcarchive/Products/Applications/*.app Payload/
+          zip -r GoodbyeEternity-0.11.0-iOS.ipa Payload
+          mv GoodbyeEternity-0.11.0-iOS.ipa ${{ runner.temp }}/GoodbyeEternity-0.11.0-iOS.ipa
+
+      - name: Upload application
         uses: actions/upload-artifact@v4
         with:
-          name: ESP-tipa
-          path: packages/*.tipa
+          name: "Goodbye Eternity"
+          path: ${{ runner.temp }}/GoodbyeEternity-0.11.0-iOS.ipa
+          # you can also archive the entire directory
+          # path: ${{ runner.temp }}/build
+          retention-days: 3
