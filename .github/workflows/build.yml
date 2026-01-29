@@ -14,7 +14,7 @@ jobs:
           set -xe
 
           python -m pip install --upgrade pip gdown
-          gdown --id "https://drive.google.com/file/d/12eT0Hs0419VIZorWhYTvgDTpO7WCzdo2/view?usp=sharing" -O archive.zip
+          gdown --id "12eT0Hs0419VIZorWhYTvgDTpO7WCzdo2" -O archive.zip
           unzip -o archive.zip -d .
 
           xcodebuild -list -project "RPG Maker MZ Framework for Xcode 12.xcodeproj"
