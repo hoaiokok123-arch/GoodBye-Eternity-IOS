@@ -1,7 +1,5 @@
-
 name: "Build iOS app"
 
-# on: [push]
 on: [workflow_dispatch]
 
 jobs:
@@ -15,29 +13,28 @@ jobs:
         run: |
           set -xe
 
-          wget -O archive.zip "https://www.dropbox.com/scl/fi/o3ynsqcru15xi1cc75hmy/hoaiok.zip?rlkey=9raxlaihz72gjvdy4y1u8ghju&st=vuvihrds&dl=1"
+          python -m pip install --upgrade pip gdown
+          gdown --id "https://drive.google.com/file/d/12eT0Hs0419VIZorWhYTvgDTpO7WCzdo2/view?usp=sharing" -O archive.zip
           unzip -o archive.zip -d .
 
-          xcodebuild -list -project "Goodbye Eternity.xcodeproj"
+          xcodebuild -list -project "RPG Maker MZ Framework for Xcode 12.xcodeproj"
 
           xcodebuild archive \
-            -project "Goodbye Eternity.xcodeproj" \
-            -scheme "Goodbye Eternity" \
-            -archivePath "Goodbye Eternity.xcarchive" \
+            -project "RPG Maker MZ Framework for Xcode 12.xcodeproj" \
+            -scheme "RPG Maker MZ Framework for Xcode 12" \
+            -archivePath "RPG Maker MZ Framework for Xcode 12.xcarchive" \
             -configuration Release \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
           mkdir Payload
-          mv Goodbye\ Eternity.xcarchive/Products/Applications/*.app Payload/
-          zip -r GoodbyeEternity-0.11.0-iOS.ipa Payload
-          mv GoodbyeEternity-0.11.0-iOS.ipa ${{ runner.temp }}/GoodbyeEternity-0.11.0-iOS.ipa
+          mv "RPG Maker MZ Framework for Xcode 12.xcarchive/Products/Applications/"*.app Payload/
+          zip -r TF27-iOS.ipa Payload
+          mv TF27-iOS.ipa ${{ runner.temp }}/TF27-iOS.ipa
 
       - name: Upload application
         uses: actions/upload-artifact@v4
         with:
-          name: "Goodbye Eternity"
-          path: ${{ runner.temp }}/GoodbyeEternity-0.11.0-iOS.ipa
-          # you can also archive the entire directory
-          # path: ${{ runner.temp }}/build
+          name: "TF27"
+          path: ${{ runner.temp }}/TF27-iOS.ipa
           retention-days: 3
